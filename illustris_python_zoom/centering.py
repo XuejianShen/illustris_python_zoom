@@ -1,8 +1,6 @@
 from __future__ import print_function
 
 import numpy as np
-import six
-from os.path import isfile
 
 # --------------------------------------------------------------------------------------------------
 # center position, velocity
