@@ -1,16 +1,12 @@
 # README #
 
-The Illustris Simulation: Public Data Release
-
-Example code (Python).
+This is a modified version of the illustris_python package prepared for the Illustris and IllustrisTNG project.
 
 See the [Illustris Website Data Access Page](http://www.illustris-project.org/data/) for details.
 
 # Install
 
-
 ```
-git clone git@github.com:illustristng/illustris_python.git
-cd illustris_python
+cd illustris_python_zoom
 pip install .
 ```
