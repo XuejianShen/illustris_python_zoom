@@ -34,6 +34,11 @@ def getNumPart(header):
 
     return nPart
 
+def getParameters(basepath, snapnum):
+    """ Load the parameters from the header of a snapshot file. """
+    with h5py.File(snapPath(basepath, snapnum), 'r') as f:
+        header_parameter = dict(f['Parameters'].attrs.items())
+    return header_parameter
 
 def loadSubset(basePath, snapNum, partType, fields=None, subset=None, mdi=None, sq=True, float32=False):
     """ Load a subset of fields for all particles/cells of a given partType.
@@ -47,7 +52,7 @@ def loadSubset(basePath, snapNum, partType, fields=None, subset=None, mdi=None, 
     result = {}
 
     ptNum = partTypeNum(partType)
-    gName = "PartType" + str(ptNum)
+    gName = f"PartType{ptNum:d}"
 
     # make sure fields is not a single element
     if isinstance(fields, six.string_types):
@@ -127,7 +132,7 @@ def loadSubset(basePath, snapNum, partType, fields=None, subset=None, mdi=None, 
         numToReadLocal = numToRead
 
         if fileOff + numToReadLocal > numTypeLocal:
-            numToReadLocal = numTypeLocal - fileOff
+            numToReadLocal = (numTypeLocal - fileOff).astype(np.int64)
 
         #print('['+str(fileNum).rjust(3)+'] off='+str(fileOff)+' read ['+str(numToReadLocal)+\
         #      '] of ['+str(numTypeLocal)+'] remaining = '+str(numToRead-numToReadLocal))
@@ -135,10 +140,12 @@ def loadSubset(basePath, snapNum, partType, fields=None, subset=None, mdi=None, 
         # loop over each requested field for this particle type
         for i, field in enumerate(fields):
             # read data local to the current file
+            wOffsetEnd = (wOffset+numToReadLocal).astype(np.int64)
+            fileOffEnd = (fileOff+numToReadLocal).astype(np.int64)
             if mdi is None or mdi[i] is None:
-                result[field][wOffset:wOffset+numToReadLocal] = f[gName][field][fileOff:fileOff+numToReadLocal]
+                result[field][wOffset:wOffsetEnd] = f[gName][field][fileOff:fileOffEnd]
             else:
-                result[field][wOffset:wOffset+numToReadLocal] = f[gName][field][fileOff:fileOff+numToReadLocal, mdi[i]]
+                result[field][wOffset:wOffsetEnd] = f[gName][field][fileOff:fileOffEnd, mdi[i]]
 
         wOffset   += numToReadLocal
         numToRead -= numToReadLocal

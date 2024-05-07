@@ -6,6 +6,7 @@ import six
 from os.path import isfile,expanduser
 import numpy as np
 import h5py
+from .snapshot import snapPath
 
 
 def gcPath(basePath, snapNum, chunkNum=0):
@@ -110,13 +111,17 @@ def loadHalos(basePath, snapNum, fields=None):
 
     return loadObjects(basePath, snapNum, "Group", "groups", fields)
 
-
-def loadHeader(basePath, snapNum):
-    """ Load the group catalog header. """
-    with h5py.File(gcPath(basePath, snapNum), 'r') as f:
-        header = dict(f['Header'].attrs.items())
-
-    return header
+def loadHeader(basepath, snapnum):
+    if isfile(snapPath(basepath, snapnum)):
+        with h5py.File(snapPath(basepath, snapnum), 'r') as f:
+            header = dict(f['Header'].attrs.items())
+        return header
+    elif isfile(gcPath(basepath, snapnum)):
+        with h5py.File(gcPath(basepath, snapnum), 'r') as f:
+            header = dict(f['Header'].attrs.items())
+        return header
+    else:
+        raise Exception("No snapshot or group file found.")
 
 
 def load(basePath, snapNum):
