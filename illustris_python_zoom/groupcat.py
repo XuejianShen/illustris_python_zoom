@@ -6,8 +6,6 @@ import six
 from os.path import isfile,expanduser
 import numpy as np
 import h5py
-from .snapshot import snapPath
-
 
 def gcPath(basePath, snapNum, chunkNum=0):
     """ Return absolute path to a group catalog HDF5 file (modify as needed). """
@@ -110,28 +108,6 @@ def loadHalos(basePath, snapNum, fields=None):
        (optionally restrict to a subset given by fields). """
 
     return loadObjects(basePath, snapNum, "Group", "groups", fields)
-
-def loadHeader(basepath, snapnum):
-    if isfile(snapPath(basepath, snapnum)):
-        with h5py.File(snapPath(basepath, snapnum), 'r') as f:
-            header = dict(f['Header'].attrs.items())
-        return header
-    elif isfile(gcPath(basepath, snapnum)):
-        with h5py.File(gcPath(basepath, snapnum), 'r') as f:
-            header = dict(f['Header'].attrs.items())
-        return header
-    else:
-        raise Exception("No snapshot or group file found.")
-
-
-def load(basePath, snapNum):
-    """ Load complete group catalog all at once. """
-    r = {}
-    r['subhalos'] = loadSubhalos(basePath, snapNum)
-    r['halos']    = loadHalos(basePath, snapNum)
-    r['header']   = loadHeader(basePath, snapNum)
-    return r
-
 
 def loadSingle(basePath, snapNum, haloID=-1, subhaloID=-1):
     """ Return complete group catalog information for one halo or subhalo. """

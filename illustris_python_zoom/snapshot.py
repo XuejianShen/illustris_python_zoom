@@ -40,6 +40,18 @@ def getParameters(basepath, snapnum):
         header_parameter = dict(f['Parameters'].attrs.items())
     return header_parameter
 
+def loadHeader(basepath, snapnum):
+    if isfile(snapPath(basepath, snapnum)):
+        with h5py.File(snapPath(basepath, snapnum), 'r') as f:
+            header = dict(f['Header'].attrs.items())
+        return header
+    elif isfile(gcPath(basepath, snapnum)):
+        with h5py.File(gcPath(basepath, snapnum), 'r') as f:
+            header = dict(f['Header'].attrs.items())
+        return header
+    else:
+        raise Exception("No snapshot or group file found.")
+
 def loadSubset(basePath, snapNum, partType, fields=None, subset=None, mdi=None, sq=True, float32=False):
     """ Load a subset of fields for all particles/cells of a given partType.
         If offset and length specified, load only that subset of the partType.
