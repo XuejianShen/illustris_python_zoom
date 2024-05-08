@@ -1,7 +1,9 @@
-# Packages required for basic usage of `illustris_python` package
+# Packages required for basic usage of `illustris_python_zoom` package
 numpy
 h5py
 six
+astropy
+swiftsimio
 
 # Packages required for unit tests
 nose

@@ -1,5 +1,7 @@
 """ Illustris Simulation: Public Data Release.
 util.py: Various helper functions. """
+import numpy as np
+#import astropy.constants as const
 
 def partTypeNum(partType):
     """ Mapping between common names and numeric particle types. """
