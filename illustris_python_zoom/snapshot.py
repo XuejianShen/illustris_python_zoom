@@ -24,13 +24,13 @@ def snapPath(basePath, snapNum, chunkNum=0):
 def getNumPart(header):
     """ Calculate number of particles of all types given a snapshot header. """
     if 'NumPart_Total_HighWord' not in header:
-        return header['NumPart_Total'] # new uint64 convention
+        return np.int64(header['NumPart_Total']) # new uint64 convention
 
     nTypes = 6
 
     nPart = np.zeros(nTypes, dtype=np.int64)
     for j in range(nTypes):
-        nPart[j] = header['NumPart_Total'][j] | (header['NumPart_Total_HighWord'][j] << 32)
+        nPart[j] = header['NumPart_Total'][j] | (np.int64(header['NumPart_Total_HighWord'][j]) << 32)
 
     return nPart
 
@@ -260,7 +260,16 @@ def loadOriginalZoom(basePath, snapNum, id, partType, fields=None):
 
     # combine and return
     if isinstance(data1, np.ndarray):
+        # protect against empty data
+        if isinstance(data2, dict):
+            return data1
         return np.concatenate((data1,data2), axis=0)
+    
+    # protect against empty data
+    if data1["count"] == 0:
+        return data2
+    elif data2["count"] == 0:
+        return data1
     
     data = {'count':data1['count']+data2['count']}
     for key in data1.keys():
