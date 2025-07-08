@@ -36,9 +36,16 @@ def getNumPart(header):
 
 def getParameters(basepath, snapnum):
     """ Load the parameters from the header of a snapshot file. """
-    with h5py.File(snapPath(basepath, snapnum), 'r') as f:
-        header_parameter = dict(f['Parameters'].attrs.items())
-    return header_parameter
+    if isfile(snapPath(basepath, snapnum)):
+        with h5py.File(snapPath(basepath, snapnum), 'r') as f:
+            header_parameter = dict(f['Parameters'].attrs.items())
+        return header_parameter
+    elif isfile(gcPath(basepath, snapnum)):
+        with h5py.File(gcPath(basepath, snapnum), 'r') as f:
+            header_parameter = dict(f['Parameters'].attrs.items())
+        return header_parameter
+    else:
+        raise Exception("No snapshot or groupcat file found.")
 
 def loadHeader(basepath, snapnum):
     if isfile(snapPath(basepath, snapnum)):
@@ -50,7 +57,7 @@ def loadHeader(basepath, snapnum):
             header = dict(f['Header'].attrs.items())
         return header
     else:
-        raise Exception("No snapshot or group file found.")
+        raise Exception("No snapshot or groupcat file found.")
 
 def loadSubset(basePath, snapNum, partType, fields=None, subset=None, mdi=None, sq=True, float32=False):
     """ Load a subset of fields for all particles/cells of a given partType.
