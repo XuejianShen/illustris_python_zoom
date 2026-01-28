@@ -5,7 +5,7 @@ from __future__ import print_function
 import numpy as np
 import h5py
 import six
-from os.path import isfile
+from os.path import isfile, expanduser
 
 from .util import partTypeNum
 from .groupcat import gcPath, offsetPath, loadSingle
@@ -13,11 +13,18 @@ from .groupcat import gcPath, offsetPath, loadSingle
 
 def snapPath(basePath, snapNum, chunkNum=0):
     """ Return absolute path to a snapshot HDF5 file (modify as needed). """
-    snapPath = basePath + '/snapdir_' + str(snapNum).zfill(3) + '/'
-    filePath1 = snapPath + 'snap_' + str(snapNum).zfill(3) + '.' + str(chunkNum) + '.hdf5'
-    filePath2 = filePath1.replace('/snap_', '/snapshot_')
+    # First, check if snapshot chunks live directly under basePath.
+    filePath0 = f"{basePath}/snap_{snapNum:03d}.hdf5"
 
-    if isfile(filePath1):
+    if isfile(expanduser(filePath0)):
+        return filePath0
+
+    # Otherwise, check the standard snapdir_XXX subdirectory.
+    snapDir = f"{basePath}/snapdir_{snapNum:03d}/"
+    filePath1 = f"{snapDir}snap_{snapNum:03d}.{chunkNum:d}.hdf5"
+    filePath2 = f"{snapDir}snapshot_{snapNum:03d}.{chunkNum:d}.hdf5"
+
+    if isfile(expanduser(filePath1)):
         return filePath1
     return filePath2
 

@@ -9,9 +9,15 @@ import h5py
 
 def gcPath(basePath, snapNum, chunkNum=0):
     """ Return absolute path to a group catalog HDF5 file (modify as needed). """
-    gcPath = basePath + '/groups_%03d/' % snapNum
-    filePath1 = gcPath + 'groups_%03d.%d.hdf5' % (snapNum, chunkNum)
-    filePath2 = gcPath + 'fof_subhalo_tab_%03d.%d.hdf5' % (snapNum, chunkNum)
+    # Check if file is directly under basePath
+    filePath0 = f"{basePath}/fof_subhalo_tab_{snapNum:03d}.hdf5"
+    if isfile(expanduser(filePath0)):
+        return filePath0
+    
+    # Check in groups_XXX subdirectory
+    gcDir = f"{basePath}/groups_{snapNum:03d}/"
+    filePath1 = f"{gcDir}groups_{snapNum:03d}.{chunkNum:d}.hdf5"
+    filePath2 = f"{gcDir}fof_subhalo_tab_{snapNum:03d}.{chunkNum:d}.hdf5"
 
     if isfile(expanduser(filePath1)):
         return filePath1
